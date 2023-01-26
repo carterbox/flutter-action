@@ -29,6 +29,10 @@ inputs:
     description: 'The architecture of Flutter SDK executable (x64 or arm64)'
     required: false
     default: '${{ runner.arch }}'
+  shell:
+    description: 'The shell to use for setting up the Flutter SDK'
+    required: false
+    default: bash
 outputs:
   CACHE-PATH:
     value: '${{ steps.flutter-action.outputs.CACHE-PATH }}'
@@ -45,11 +49,11 @@ runs:
   steps:
     - id: flutter-action
       run: $GITHUB_ACTION_PATH/setup.sh -p -c '${{ inputs.cache-path }}' -k '${{ inputs.cache-key }}' -n '${{ inputs.flutter-version }}' -a '${{ inputs.architecture }}' ${{ inputs.channel }}
-      shell: bash
+      shell: ${{ inputs.shell }}
     - if: ${{ inputs.cache == 'true' }}
       uses: actions/cache@v3
       with:
         path: ${{ steps.flutter-action.outputs.CACHE-PATH }}
         key: ${{ steps.flutter-action.outputs.CACHE-KEY }}
     - run: $GITHUB_ACTION_PATH/setup.sh -c '${{ steps.flutter-action.outputs.CACHE-PATH }}' -n '${{ steps.flutter-action.outputs.VERSION }}' -a '${{ steps.flutter-action.outputs.ARCHITECTURE }}' ${{ steps.flutter-action.outputs.CHANNEL }}
-      shell: bash
+      shell: ${{ inputs.shell }}
